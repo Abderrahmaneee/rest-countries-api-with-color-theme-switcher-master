@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css">
+    <script src="https://kit.fontawesome.com/66161718a0.js"></script>
+    <title>Where in the world?</title>
+</head>
+<body>
+    <main class="container">
+        <header class="header">
+            <div class="title">
+                Where in the world?
+            </div>
+            <div class="switch-color">
+               <i class="far fa-moon" aria-hidden="true"></i> Dark Mode
+            </div>
+        </header>
+        <section class="contries">
+            <div class="search-contry">
+            <span class="search">
+                <i class="fas fa-search" aria-hidden="true"></i><input type="text" placeholder="Search for a country..." id="search" value="">
+            </span>
+            </div>
+            <div class="regionFilter">
+              	<div class="dropdown" id="filter">
+					Filter by Region
+					<i class="fas fa-chevron-down"></i>
+					<ul>
+						<li>All</li>
+						<li>Africa</li>
+						<li>Americas</li>
+						<li>Asia</li>
+						<li>Europe</li>
+						<li>Oceania</li>
+					</ul>
+				</div>
+            </div>
+        </section>
+            <section class="CountryList" id="CountryList">
+                <h2 class="loading">Contries Loading...</h2>
+            </section>
+        </main>
+        <script>
+            const btnDark = document.querySelector('.switch-color');
+            if(btnDark){
+        btnDark.addEventListener('click',() => {
+        document.body.classList.toggle('dark');
+    if (document.body.className === 'dark') {
+        btnDark.innerHTML = `
+        <i class="far fa-sun"></i>
+        Light Mode
+        `
+    }
+    else {
+        btnDark.innerHTML = `
+        <i class="far fa-moon"></i>
+        Dark Mode
+        `
+    }
+})  
+}
+         const searchTerm = document.getElementById("search-term");
+         const searchBtn = document.getElementById("search");
+         const APIURL = "js/api.json";
+         const IMGPATH = "https://image.tmdb.org/t/p/w1280";
+         const SEARCHAPI = "https://restcountries.eu/rest/v2/name/";
+         const form = document.getElementById("search");
+         const countriesEl = document.getElementById('CountryList');  
+         const filterBtn = document.getElementById('filter');
+         const regionFilters = filterBtn.querySelectorAll('li');
+         const closeBtn = document.getElementById('close');
+
+getCountries();
+async function getCountries(){
+    const res = await fetch(APIURL);
+    const data = await res.json();
+
+	displayCountries(data);
+}
+
+function displayCountries(countries) {
+	countriesEl.innerHTML = '';
+	countries.forEach(country => {
+		const countryEl = document.createElement('div');
+		countryEl.classList.add('countryItem');
+		countryEl.innerHTML = `
+                    <a href="">
+                      <figure>
+                          <div class="country_image" >
+                            <img src="${country.flag}" alt="${country.name}" />
+                          </div>
+                          <figcaption class="countryItem-text">
+                              <h2 class="country-name">${country.name}</h2>
+                              <div>Population :<span class="countryItem-lightCaption"> ${country.population}</span></div>
+                              <div class="country-region">Region :<span class="countryItem-lightCaption"> ${country.region}</span></div>
+                              <div>Capital :<span class="countryItem-lightCaption"> ${country.capital}</span></div>
+                          </figcaption>
+                       </figure>
+                    </a>
+        `;   
+      countriesEl.appendChild(countryEl);
+
+    });
+}
+form.addEventListener('input', e => {
+	const { value } = e.target;
+	const countryName = document.querySelectorAll('.country-name');
+
+	countryName.forEach(name => {
+		if (name.innerText.toLowerCase().includes(value.toLowerCase())) {
+			name.parentElement.parentElement.parentElement.parentElement.style.display = 'block';
+		} else {
+			name.parentElement.parentElement.parentElement.parentElement.style.display = 'none';
+		}
+	});
+});
+regionFilters.forEach(filter => {
+	filter.addEventListener('click', () => {
+		const value = filter.innerText;
+		const countryRegion = document.querySelectorAll('.country-region');
+
+		countryRegion.forEach(region => {
+			if (region.innerText.includes(value) || value === 'All') {
+				region.parentElement.parentElement.parentElement.parentElement.style.display = 'block';
+			} else {
+				region.parentElement.parentElement.parentElement.parentElement.style.display = 'none';
+			}
+		});
+	});
+});
+filterBtn.addEventListener('click', () => {
+	filterBtn.classList.toggle('open');
+});
+
+closeBtn.addEventListener('click', () => {
+	modal.style.display = 'none';
+});
+        </script>
+</body>
+</html>
